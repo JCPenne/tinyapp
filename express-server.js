@@ -23,6 +23,10 @@ app.get('/Hello', (req, res) => {
       </html>
     \n`);
 });
+app.get('/urls', (req, res) => {
+  const templateVars = { urls: URLDatabase };
+  res.render(`urls-index`, templateVars);
+});
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
