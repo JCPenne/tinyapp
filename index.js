@@ -13,6 +13,15 @@ app.get('/', (req, res) => {
 app.get('/urls.json', (req, res) => {
   res.json(URLDatabase);
 });
+app.get('/Hello', (req, res) => {
+  res.send(`
+    <html>
+      <body>
+        Hello <b>World</b>
+      </body>
+      </html>
+    \n`);
+});
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
