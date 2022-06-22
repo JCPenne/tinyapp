@@ -10,6 +10,9 @@ const URLDatabase = {
 app.get('/', (req, res) => {
   res.send(`Hello!`);
 });
+app.get('/urls.json', (req, res) => {
+  res.json(URLDatabase);
+});
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
