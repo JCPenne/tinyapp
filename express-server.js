@@ -33,8 +33,11 @@ const generateRandomString = URL => {
 //     \n`);
 // });
 app.post('/urls', (req, res) => {
-  console.log(req.body);
-  res.send(generateRandomString(req.body));
+  const longURL = Object.values(req.body).toString();
+  const shortURL = generateRandomString(longURL);
+  URLDatabase[shortURL] = longURL;
+  res.redirect(302, `/urls/${shortURL}`);
+  console.log(URLDatabase);
 });
 app.get('/urls', (req, res) => {
   const templateVars = { urls: URLDatabase };
@@ -46,6 +49,10 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: URLDatabase[req.params.shortURL] };
   res.render(`urls-show`, templateVars);
+});
+app.get('/u/:shortURL', (req, res) => {
+  const longURL = URLDatabase[req.params.shortURL];
+  res.redirect(longURL);
 });
 
 app.listen(PORT, () => {
