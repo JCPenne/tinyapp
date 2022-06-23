@@ -9,7 +9,13 @@ const URLDatabase = {
   '2bxVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com',
 };
-const generateRandomString = () => {};
+const generateRandomString = URL => {
+  result = '';
+  for (let i = 0; i < 6; i++) {
+    result += Math.random().toString(36).slice(-1);
+  }
+  return result;
+};
 
 // app.get('/', (req, res) => {
 //   res.send(`Hello!`);
@@ -28,7 +34,7 @@ const generateRandomString = () => {};
 // });
 app.post('/urls', (req, res) => {
   console.log(req.body);
-  res.send('Ok');
+  res.send(generateRandomString(req.body));
 });
 app.get('/urls', (req, res) => {
   const templateVars = { urls: URLDatabase };
