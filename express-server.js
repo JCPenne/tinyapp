@@ -9,21 +9,26 @@ const URLDatabase = {
   '2bxVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com',
 };
+const generateRandomString = () => {};
 
-app.get('/', (req, res) => {
-  res.send(`Hello!`);
-});
-app.get('/urls.json', (req, res) => {
-  res.json(URLDatabase);
-});
-app.get('/Hello', (req, res) => {
-  res.send(`
-    <html>
-      <body>
-        Hello <b>World</b>
-      </body>
-      </html>
-    \n`);
+// app.get('/', (req, res) => {
+//   res.send(`Hello!`);
+// });
+// app.get('/urls.json', (req, res) => {
+//   res.json(URLDatabase);
+// });
+// app.get('/Hello', (req, res) => {
+//   res.send(`
+//     <html>
+//       <body>
+//         Hello <b>World</b>
+//       </body>
+//       </html>
+//     \n`);
+// });
+app.post('/urls', (req, res) => {
+  console.log(req.body);
+  res.send('Ok');
 });
 app.get('/urls', (req, res) => {
   const templateVars = { urls: URLDatabase };
