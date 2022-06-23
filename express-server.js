@@ -27,6 +27,9 @@ app.get('/urls', (req, res) => {
   const templateVars = { urls: URLDatabase };
   res.render(`urls-index`, templateVars);
 });
+app.get('/urls/new', (req, res) => {
+  res.render('urls-new');
+});
 app.get('/urls/:shortURL', (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: URLDatabase[req.params.shortURL] };
   res.render(`urls-show`, templateVars);
