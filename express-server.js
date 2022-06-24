@@ -51,7 +51,10 @@ app.get('/urls', (req, res) => {
   res.render(`urls-index`, templateVars);
 });
 app.get('/urls/new', (req, res) => {
-  res.render('urls-new');
+  const templateVars = {
+    username: req.cookies['username'],
+  };
+  res.render('urls-new', templateVars);
 });
 app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {
