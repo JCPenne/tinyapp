@@ -38,27 +38,31 @@ app.listen(PORT, () => {
 
 //GETS
 app.get('/urls', (req, res) => {
+  const user = users[req.cookies['userID']];
   const templateVars = {
-    username: req.cookies['username'],
+    username: user.email,
     urls: URLDatabase,
   };
   res.render(`urls-index`, templateVars);
 });
 app.get('/urls/new', (req, res) => {
+  const user = users[req.cookies['userID']];
   const templateVars = {
-    username: req.cookies['username'],
+    username: user.email,
   };
   res.render('urls-new', templateVars);
 });
 app.get('/urls/register', (req, res) => {
+  const user = users[req.cookies['userID']];
   const templateVars = {
-    username: req.cookies['username'],
+    username: user.email,
   };
   res.render('urls-register', templateVars);
 });
 app.get('/urls/:shortURL', (req, res) => {
+  const user = users[req.cookies['userID']];
   const templateVars = {
-    username: req.cookies['username'],
+    username: user.email,
     shortURL: req.params.shortURL,
     longURL: URLDatabase[req.params.shortURL],
   };
