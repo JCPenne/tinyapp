@@ -37,6 +37,19 @@ const users = {
   },
 };
 
+//Global Functions
+
+const emailChecker = emailPara => {
+  let result = false;
+  for (let user in users) {
+    let currentEmail = users[user].email;
+    if (emailPara === currentEmail) {
+      result = true;
+    }
+  }
+  return result;
+};
+
 //Message on server start up
 
 app.listen(PORT, () => {
@@ -104,14 +117,17 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  console.log(req.body);
-  email = req.body.email;
-  password = req.body.password;
-  if (!email || !password) {
-    throw new Error(400);
-  }
-  userID = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
 
+  if (!email || !password) {
+    throw new Error(`400 Email and Password fields cannot be empty`);
+  }
+  if (emailChecker(email)) {
+    throw new Error('400 that email is already in use');
+  }
+
+  userID = generateRandomString();
   users[userID] = {
     id: userID,
     email: req.body.email,
