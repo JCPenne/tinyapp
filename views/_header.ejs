@@ -8,12 +8,18 @@
     <div class="navbar-nav">
     <a class="nav-item nav-link" href="/urls">My URLs</a>
     <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-    <form class="nav-item nav-link" action="/login" method="POST">
-      Username:
-      <input type="text" name="username" placeholder="Tiny Apper" style="width:100px;">
-      <input type="submit" value="Submit" >
-    </form>
-    <p class="nav-item nav-link">Currently logged in as <%=username%></p>
+    <% if(username){ %>
+      <form class="nav-item nav-link" action="/logout" method="POST">
+        <p class="nav-item nav-link"><%=username%></p>
+        <input type="submit" value="Logout">
+      </form>
+    <% } else{ %>
+      <form class="nav-item nav-link" action="/login" method="POST">
+        Username:
+        <input type="text" name="username" placeholder="Tiny Apper" style="width:100px;">
+        <input type="submit" value="Submit" >
+      </form>
+    <% } %>
       </div>
    </div>
   </nav>
