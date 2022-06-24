@@ -4,7 +4,11 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const app = express();
 const PORT = 8080;
+
 app.set(`view engine`, `ejs`);
+app.use(cookieParser());
+app.use(morgan('tiny'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const URLDatabase = {
   '2bxVn2': 'http://www.lighthouselabs.ca',
@@ -18,30 +22,17 @@ const generateRandomString = URL => {
   return result;
 };
 
-// app.get('/', (req, res) => {
-//   res.send(`Hello!`);
-// });
-// app.get('/urls.json', (req, res) => {
-//   res.json(URLDatabase);
-// });
-// app.get('/Hello', (req, res) => {
-//   res.send(`
-//     <html>
-//       <body>
-//         Hello <b>World</b>
-//       </body>
-//       </html>
-//     \n`);
-// });
-app.use(cookieParser());
-app.use(morgan('tiny'));
-app.use(bodyParser.urlencoded({ extended: true }));
-
 app.post('/urls', (req, res) => {
   const longURL = Object.values(req.body).toString();
   const shortURL = generateRandomString(longURL);
   URLDatabase[shortURL] = longURL;
   res.redirect(302, `/urls/${shortURL}`);
+});
+app.get('/urls/register', (req, res) => {
+  const templateVars = {
+    username: req.cookies['username'],
+  };
+  res.render('urls-register', templateVars);
 });
 app.get('/urls', (req, res) => {
   const templateVars = {
