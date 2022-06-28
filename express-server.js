@@ -96,6 +96,7 @@ app.get('/urls/login', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
+  console.log(req.body);
   const userID = req.cookies.userID;
   const user = users[userID];
 
@@ -145,11 +146,13 @@ app.post('/register', (req, res) => {
   }
 
   userID = generateRandomString();
+
   users[userID] = {
     id: userID,
     email,
     password,
   };
+
   res.cookie('userID', userID);
   res.redirect('/urls');
 });
@@ -160,7 +163,6 @@ app.post('/login', (req, res) => {
   const emailCheck = userChecker('email', email).result;
   const passwordCheck = userChecker('password', password).result;
   const user = userChecker('email', email).user;
-  console.log(user);
 
   if (!emailCheck) {
     throw new Error('403 email not found');
