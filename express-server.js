@@ -40,15 +40,20 @@ const generateRandomString = URL => {
   return result;
 };
 
-const emailChecker = emailPara => {
-  let result = false;
+const userChecker = (key, value) => {
+  let resultObj = {
+    result: false,
+  };
   for (let user in users) {
-    let currentEmail = users[user].email;
-    if (emailPara === currentEmail) {
-      result = true;
+    let currentKey = users[user][key];
+    if (value === currentKey) {
+      resultObj = {
+        user,
+        result: true,
+      };
     }
   }
-  return result;
+  return resultObj;
 };
 
 //Message on server start up
@@ -81,7 +86,13 @@ app.get('/urls/register', (req, res) => {
 });
 
 app.get('/urls/login', (req, res) => {
-  res.render('urls-login');
+  const userID = req.cookies.userID;
+  const user = users[userID];
+
+  const templateVars = {
+    user,
+  };
+  res.render('urls-login', templateVars);
 });
 
 app.get('/urls/new', (req, res) => {
@@ -124,26 +135,40 @@ app.post('/urls', (req, res) => {
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const emailCheck = userChecker('email', email).result;
 
   if (!email || !password) {
     throw new Error(`400 Email and Password fields cannot be empty`);
   }
-  if (emailChecker(email)) {
+  if (emailCheck) {
     throw new Error('400 that email is already in use');
   }
 
   userID = generateRandomString();
   users[userID] = {
     id: userID,
-    email: req.body.email,
-    password: req.body.password,
+    email,
+    password,
   };
   res.cookie('userID', userID);
   res.redirect('/urls');
 });
 
 app.post('/login', (req, res) => {
-  res.cookie('userID', req.body[userID]);
+  const email = req.body.email;
+  const password = req.body.password;
+  const emailCheck = userChecker('email', email).result;
+  const passwordCheck = userChecker('password', password).result;
+  const user = userChecker('email', email).user;
+  console.log(user);
+
+  if (!emailCheck) {
+    throw new Error('403 email not found');
+  }
+  if (!passwordCheck) {
+    throw new Error('403 password does not match');
+  }
+  res.cookie('userID', user);
   res.redirect('/urls');
 });
 
