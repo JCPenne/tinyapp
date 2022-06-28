@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const nodemon = require('nodemon');
 const app = express();
 const PORT = 8080;
 
@@ -13,16 +14,6 @@ app.use(morgan('tiny'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //Global Vars
-
-const generateRandomString = URL => {
-  result = '';
-
-  for (let i = 0; i < 6; i++) {
-    result += Math.random().toString(36).slice(-1);
-  }
-
-  return result;
-};
 
 const URLDatabase = {
   '2bxVn2': 'http://www.lighthouselabs.ca',
@@ -38,6 +29,16 @@ const users = {
 };
 
 //Global Functions
+
+const generateRandomString = URL => {
+  result = '';
+
+  for (let i = 0; i < 6; i++) {
+    result += Math.random().toString(36).slice(-1);
+  }
+
+  return result;
+};
 
 const emailChecker = emailPara => {
   let result = false;
@@ -69,16 +70,6 @@ app.get('/urls', (req, res) => {
   res.render(`urls-index`, templateVars);
 });
 
-app.get('/urls/new', (req, res) => {
-  const userID = req.cookies.userID;
-  const user = users[userID];
-
-  const templateVars = {
-    user,
-  };
-  res.render('urls-new', templateVars);
-});
-
 app.get('/urls/register', (req, res) => {
   const userID = req.cookies.userID;
   const user = users[userID];
@@ -87,6 +78,20 @@ app.get('/urls/register', (req, res) => {
     user,
   };
   res.render('urls-register', templateVars);
+});
+
+app.get('/urls/login', (req, res) => {
+  res.render('urls-login');
+});
+
+app.get('/urls/new', (req, res) => {
+  const userID = req.cookies.userID;
+  const user = users[userID];
+
+  const templateVars = {
+    user,
+  };
+  res.render('urls-new', templateVars);
 });
 
 app.get('/urls/:shortURL', (req, res) => {

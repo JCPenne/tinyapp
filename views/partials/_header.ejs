@@ -6,21 +6,15 @@
    </button> 
    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
+    <a class="nav-item nav-link" href="/urls/register">Register</a>
+    <a class="nav-item nav-link" href="/urls/login">Login</a>
     <a class="nav-item nav-link" href="/urls">My URLs</a>
     <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-    <a class="nav-item nav-link" href="/urls/register">Create an Account</a>
-    <% if(user){ %>
+    <% if(user) { %>
       <form class="nav-item nav-link" action="/logout" method="POST">
-        <p class="nav-item nav-link">Logged in as: <%=user.email%>!</p>
-        <input type="submit" value="Logout">
+        <input type="submit" value="Logout"
       </form>
-    <% } else{ %>
-      <form class="nav-item nav-link" action="/login" method="POST" >
-        Username:
-        <input type="text" name="username" placeholder="Tiny Apper" style="width:100px;">
-        <input type="submit" value="Login">
-      </form>
-    <% } %>
+      <%}%>
       </div>
    </div>
   </nav>
