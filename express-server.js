@@ -96,9 +96,12 @@ app.get('/urls/login', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  console.log(req.body);
   const userID = req.cookies.userID;
   const user = users[userID];
+
+  if (!userID) {
+    res.redirect('/urls/login');
+  }
 
   const templateVars = {
     user,
@@ -126,8 +129,14 @@ app.get('/u/:shortURL', (req, res) => {
 //POSTS
 
 app.post('/urls', (req, res) => {
+  const userID = req.cookies.userID;
   const longURL = Object.values(req.body).toString();
   const shortURL = generateRandomString(longURL);
+
+  if (!userID) {
+    res.redirect('/urls/login');
+    throw new Error('401, unauthorized user');
+  }
 
   URLDatabase[shortURL] = longURL;
   res.redirect(302, `/urls/${shortURL}`);
