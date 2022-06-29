@@ -4,7 +4,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
-const nodemon = require('nodemon');
 const app = express();
 const PORT = 8080;
 
@@ -13,18 +12,30 @@ app.use(cookieParser());
 app.use(morgan('tiny'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//Message on server start up
+
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+});
+
 //Global Vars
 
 const URLDatabase = {
-  '2bxVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com',
+  '2bxVn2': {
+    longURL: 'http://www.lighthouselabs.ca',
+    userID: '',
+  },
+  '9sm5xK': {
+    longURL: 'http://www.google.com',
+    userID: '',
+  },
 };
 
 const users = {
-  userRandomID: {
-    id: 'userRandom ID',
-    email: 'user@example.com',
-    password: 'testpassword',
+  '123abc': {
+    id: '123abc',
+    email: 'a@a.com',
+    password: 'a',
   },
 };
 
@@ -44,8 +55,10 @@ const userChecker = (key, value) => {
   let resultObj = {
     result: false,
   };
+
   for (let user in users) {
     let currentKey = users[user][key];
+
     if (value === currentKey) {
       resultObj = {
         user,
@@ -56,22 +69,31 @@ const userChecker = (key, value) => {
   return resultObj;
 };
 
-//Message on server start up
+const URLChecker = (obj, user) => {
+  let result = {};
 
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
-});
+  for (entry in obj) {
+    userID = obj[entry].userID;
+    if (userID === user) {
+      result[entry] = obj[entry];
+    }
+  }
+  return result;
+};
 
 //GETS
 
 app.get('/urls', (req, res) => {
+  const currentURLs = URLDatabase;
   const userID = req.cookies.userID;
   const user = users[userID];
+  const UserURLS = URLChecker(currentURLs, userID);
 
   const templateVars = {
     user,
-    urls: URLDatabase,
+    UserURLS,
   };
+  console.log(templateVars);
   res.render(`urls-index`, templateVars);
 });
 
@@ -138,7 +160,8 @@ app.post('/urls', (req, res) => {
     throw new Error('401, unauthorized user');
   }
 
-  URLDatabase[shortURL] = longURL;
+  URLDatabase[shortURL] = { longURL, userID };
+  console.log(URLDatabase);
   res.redirect(302, `/urls/${shortURL}`);
 });
 
@@ -161,7 +184,6 @@ app.post('/register', (req, res) => {
     email,
     password,
   };
-
   res.cookie('userID', userID);
   res.redirect('/urls');
 });
