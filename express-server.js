@@ -37,6 +37,9 @@ const users = {
     email: 'a@a.com',
     password: 'a',
   },
+  abc123: {
+    id: 'abc123',
+  },
 };
 
 //Global Functions
@@ -84,11 +87,13 @@ const URLChecker = (obj, user) => {
 //GETS
 
 app.get('/urls', (req, res) => {
-  const currentURLs = URLDatabase;
   const userID = req.cookies.userID;
   const user = users[userID];
-  const UserURLS = URLChecker(currentURLs, userID);
-
+  const UserURLS = URLChecker(URLDatabase, userID);
+  if (!userChecker('id', userID).result) {
+    res.redirect('/urls/login');
+    throw new Error('404 account not found');
+  }
   const templateVars = {
     user,
     UserURLS,
@@ -131,9 +136,16 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  const userID = req.cookies.userID;
-  const user = users[userID];
+  const user = users[req.cookies.userID];
   const shortURL = req.params.shortURL;
+
+  if (!userChecker('id', user.id).result) {
+    throw new Error('404 please login to your account');
+  }
+
+  if (!URLChecker(URLDatabase, user.id).shortURL) {
+    throw new Error('That url does not belong to your account');
+  }
 
   const templateVars = {
     user,
@@ -170,6 +182,7 @@ app.post('/urls', (req, res) => {
   }
 
   URLDatabase[shortURL] = { longURL, userID };
+
   res.redirect(302, `/urls/${shortURL}`);
 });
 
@@ -215,18 +228,48 @@ app.post('/login', (req, res) => {
 
 app.post('/logout', (req, res) => {
   res.clearCookie('userID');
+
   res.redirect('/urls');
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
+
+  const user = req.cookies.userID;
+
+  if (!userChecker('id', user).result) {
+    throw new Error('404 Please log in to your account');
+  }
+  if (!URLDatabase[shortURL]) {
+    throw new Error('URL not found');
+  }
+  if (URLDatabase[shortURL].userID !== user) {
+    throw new Error('404 that URL does not belong to your account');
+  }
+
   delete URLDatabase[shortURL];
+
   res.redirect('/urls');
 });
 
 app.post('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const newLongURL = req.body.URLedit;
+
+  const URLUserID = URLDatabase[shortURL].userID;
+  const userID = req.cookies.userID;
+
+  if (!userChecker('id', user).result) {
+    throw new Error('404 Please log in to your account');
+  }
+  if (!URLDatabase.shortURL) {
+    throw new Error('URL not found');
+  }
+  if (URLDatabase[shortURL].userID !== user) {
+    throw new Error('404 that URL does not belong to your account');
+  }
+
   URLDatabase[shortURL].longURL = newLongURL;
+
   res.redirect('/urls');
 });
