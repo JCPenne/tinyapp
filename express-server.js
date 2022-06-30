@@ -2,7 +2,8 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+//const cookieParser = require('cookie-parser') ---- obsolete
+const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
 
@@ -10,9 +11,18 @@ const app = express();
 const PORT = 8080;
 
 app.set(`view engine`, `ejs`);
-app.use(cookieParser());
+// app.use(cookieParser()) ---- obsolete
 app.use(morgan('tiny'));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  cookieSession({
+    name: 'session',
+    keys: ['key1', 'key2'],
+
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  }),
+);
 
 //Message on server start up
 
@@ -93,32 +103,36 @@ const URLChecker = (obj, user) => {
 //GETS
 
 app.get('/urls', (req, res) => {
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
   const user = users[userID];
   const UserURLS = URLChecker(URLDatabase, userID);
+
   if (!userChecker('id', userID).result) {
     res.redirect('/urls/login');
     throw new Error('404 account not found');
   }
+
   const templateVars = {
     user,
     UserURLS,
   };
+
   res.render(`urls-index`, templateVars);
 });
 
 app.get('/urls/register', (req, res) => {
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
   const user = users[userID];
 
   const templateVars = {
     user,
   };
+
   res.render('urls-register', templateVars);
 });
 
 app.get('/urls/login', (req, res) => {
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
   const user = users[userID];
 
   const templateVars = {
@@ -128,7 +142,7 @@ app.get('/urls/login', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
   const user = users[userID];
 
   if (!userID) {
@@ -142,7 +156,7 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  const user = users[req.cookies.userID];
+  const user = users[req.session.userID];
   const shortURL = req.params.shortURL;
 
   if (!userChecker('id', user.id).result) {
@@ -166,7 +180,7 @@ app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = URLDatabase[shortURL].longURL;
 
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
 
   if (!userChecker('id', userID).result) {
     res.redirect(longURL);
@@ -178,7 +192,7 @@ app.get('/u/:shortURL', (req, res) => {
 //POSTS
 
 app.post('/urls', (req, res) => {
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
   const longURL = req.body.longURL;
   const shortURL = generateRandomString(longURL);
 
@@ -247,7 +261,7 @@ app.post('/logout', (req, res) => {
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
 
-  const user = req.cookies.userID;
+  const user = req.session.userID;
 
   if (!userChecker('id', user).result) {
     throw new Error('404 Please log in to your account');
@@ -269,7 +283,7 @@ app.post('/urls/:shortURL', (req, res) => {
   const newLongURL = req.body.URLedit;
 
   const URLUserID = URLDatabase[shortURL].userID;
-  const userID = req.cookies.userID;
+  const userID = req.session.userID;
 
   if (!userChecker('id', user).result) {
     throw new Error('404 Please log in to your account');
