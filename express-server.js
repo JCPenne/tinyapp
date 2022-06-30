@@ -2,16 +2,16 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-//const cookieParser = require('cookie-parser') ---- obsolete
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
+const { generateRandomString, userChecker, URLChecker } = require('./helpers');
+const { users, URLDatabase } = require('./data');
 
 const app = express();
 const PORT = 8080;
 
 app.set(`view engine`, `ejs`);
-// app.use(cookieParser()) ---- obsolete
 app.use(morgan('tiny'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
@@ -32,73 +32,31 @@ app.listen(PORT, () => {
 
 //Global Vars
 
-const URLDatabase = {
-  '2bxVn2': {
-    longURL: 'http://www.lighthouselabs.ca',
-    userID: '123abc',
-  },
-  '9sm5xK': {
-    longURL: 'http://www.google.com',
-    userID: '',
-  },
-};
-//testPassword for encrypt assignment use only
+// const URLDatabase = {
+//   '2bxVn2': {
+//     longURL: 'http://www.lighthouselabs.ca',
+//     userID: '123abc',
+//   },
+//   '9sm5xK': {
+//     longURL: 'http://www.google.com',
+//     userID: '',
+//   },
+// };
 
-const user123abchashedPassword = bcrypt.hashSync('abc', 10);
+// //testPassword for encrypt assignment use only
+// const user123abchashedPassword = bcrypt.hashSync('abc', 10);
 
-const users = {
-  '123abc': {
-    id: '123abc',
-    email: 'a@a.com',
-    password: 'abc',
-    hashedPassword: user123abchashedPassword,
-  },
-  abc123: {
-    id: 'abc123',
-  },
-};
-
-//Global Functions
-
-const generateRandomString = URL => {
-  result = '';
-
-  for (let i = 0; i < 6; i++) {
-    result += Math.random().toString(36).slice(-1);
-  }
-
-  return result;
-};
-
-const userChecker = (key, value) => {
-  let resultObj = {
-    result: false,
-  };
-
-  for (let user in users) {
-    let currentKey = users[user][key];
-
-    if (value === currentKey) {
-      resultObj = {
-        user,
-        result: true,
-      };
-    }
-  }
-  return resultObj;
-};
-
-const URLChecker = (obj, user) => {
-  let result = {};
-
-  for (entry in obj) {
-    userID = obj[entry].userID;
-    if (userID === user) {
-      result[entry] = obj[entry];
-    }
-  }
-  return result;
-};
+// const users = {
+//   '123abc': {
+//     id: '123abc',
+//     email: 'a@a.com',
+//     password: 'abc',
+//     hashedPassword: user123abchashedPassword,
+//   },
+//   abc123: {
+//     id: 'abc123',
+//   },
+// };
 
 //GETS
 
@@ -108,7 +66,7 @@ app.get('/urls', (req, res) => {
   const user = users[userID];
   const UserURLS = URLChecker(URLDatabase, userID);
 
-  if (!userChecker('id', userID).result) {
+  if (!userChecker(users, 'id', userID).result) {
     res.redirect('/urls/login');
     throw new Error('404 account not found');
   }
@@ -160,7 +118,7 @@ app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.session.userID];
   const shortURL = req.params.shortURL;
 
-  if (!userChecker('id', user.id).result) {
+  if (!userChecker(users, 'id', user.id).result) {
     throw new Error('404 please login to your account');
   }
 
@@ -183,7 +141,7 @@ app.get('/u/:shortURL', (req, res) => {
 
   const userID = req.session.userID;
 
-  if (!userChecker('id', userID).result) {
+  if (!userChecker(users, 'id', userID).result) {
     res.redirect(longURL);
     throw new Error('404 user not found');
   }
@@ -211,7 +169,7 @@ app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  const emailCheck = userChecker('email', email).result;
+  const emailCheck = userChecker(users, 'email', email).result;
 
   if (!email || !password) {
     throw new Error(`400 Email and Password fields cannot be empty`);
@@ -235,9 +193,9 @@ app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  const emailCheck = userChecker('email', email).result;
+  const emailCheck = userChecker(users, 'email', email).result;
 
-  const userID = userChecker('email', email).user;
+  const userID = userChecker(users, 'email', email).user;
 
   const hashedPassword = users[userID].hashedPassword;
 
@@ -264,7 +222,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
   const user = req.session.userID;
 
-  if (!userChecker('id', user).result) {
+  if (!userChecker(users, 'id', user).result) {
     throw new Error('404 Please log in to your account');
   }
   if (!URLDatabase[shortURL]) {
@@ -286,7 +244,7 @@ app.post('/urls/:shortURL', (req, res) => {
   // const URLUserID = URLDatabase[shortURL].userID;
   const userID = req.session.userID;
 
-  if (!userChecker('id', userID).result) {
+  if (!userChecker(users, 'id', userID).result) {
     throw new Error('404 Please log in to your account');
   }
   if (!URLDatabase[shortURL]) {
