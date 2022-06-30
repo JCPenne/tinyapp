@@ -1,4 +1,4 @@
-//Server set up
+//Server set up//
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -44,13 +44,13 @@ const URLDatabase = {
 };
 //testPassword for encrypt assignment use only
 
-const user123abchashedPassword = bcrypt.hashSync('1234567890', 10);
+const user123abchashedPassword = bcrypt.hashSync('abc', 10);
 
 const users = {
   '123abc': {
     id: '123abc',
     email: 'a@a.com',
-    password: '1234567890',
+    password: 'abc',
     hashedPassword: user123abchashedPassword,
   },
   abc123: {
@@ -104,6 +104,7 @@ const URLChecker = (obj, user) => {
 
 app.get('/urls', (req, res) => {
   const userID = req.session.userID;
+
   const user = users[userID];
   const UserURLS = URLChecker(URLDatabase, userID);
 
@@ -163,7 +164,7 @@ app.get('/urls/:shortURL', (req, res) => {
     throw new Error('404 please login to your account');
   }
 
-  if (!URLChecker(URLDatabase, user.id).shortURL) {
+  if (!URLChecker(URLDatabase, user.id)[shortURL]) {
     throw new Error('That url does not belong to your account');
   }
 
@@ -226,7 +227,7 @@ app.post('/register', (req, res) => {
     email,
     hashedPassword,
   };
-  res.cookie('userID', userID);
+  req.session.userID = userID;
   res.redirect('/urls');
 });
 
@@ -248,12 +249,12 @@ app.post('/login', (req, res) => {
   if (!passwordCheck) {
     throw new Error('403 password does not match');
   }
-  res.cookie('userID', userID);
+  req.session.userID = userID;
   res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('userID');
+  req.session = null;
 
   res.redirect('/urls');
 });
@@ -282,16 +283,16 @@ app.post('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const newLongURL = req.body.URLedit;
 
-  const URLUserID = URLDatabase[shortURL].userID;
+  // const URLUserID = URLDatabase[shortURL].userID;
   const userID = req.session.userID;
 
-  if (!userChecker('id', user).result) {
+  if (!userChecker('id', userID).result) {
     throw new Error('404 Please log in to your account');
   }
-  if (!URLDatabase.shortURL) {
-    throw new Error('URL not found');
+  if (!URLDatabase[shortURL]) {
+    throw new Error('404 URL not found');
   }
-  if (URLDatabase[shortURL].userID !== user) {
+  if (URLDatabase[shortURL].userID !== userID) {
     throw new Error('404 that URL does not belong to your account');
   }
 
