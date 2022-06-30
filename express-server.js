@@ -4,6 +4,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const bcrypt = require('bcryptjs');
+
 const app = express();
 const PORT = 8080;
 
@@ -30,12 +32,16 @@ const URLDatabase = {
     userID: '',
   },
 };
+//testPassword for encrypt assignment use only
+
+const user123abchashedPassword = bcrypt.hashSync('1234567890', 10);
 
 const users = {
   '123abc': {
     id: '123abc',
     email: 'a@a.com',
-    password: 'a',
+    password: '1234567890',
+    hashedPassword: user123abchashedPassword,
   },
   abc123: {
     id: 'abc123',
@@ -189,6 +195,7 @@ app.post('/urls', (req, res) => {
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const emailCheck = userChecker('email', email).result;
 
   if (!email || !password) {
@@ -203,7 +210,7 @@ app.post('/register', (req, res) => {
   users[userID] = {
     id: userID,
     email,
-    password,
+    hashedPassword,
   };
   res.cookie('userID', userID);
   res.redirect('/urls');
@@ -212,9 +219,14 @@ app.post('/register', (req, res) => {
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+
   const emailCheck = userChecker('email', email).result;
-  const passwordCheck = userChecker('password', password).result;
-  const user = userChecker('email', email).user;
+
+  const userID = userChecker('email', email).user;
+
+  const hashedPassword = users[userID].hashedPassword;
+
+  const passwordCheck = bcrypt.compareSync(password, hashedPassword);
 
   if (!emailCheck) {
     throw new Error('403 email not found');
@@ -222,7 +234,7 @@ app.post('/login', (req, res) => {
   if (!passwordCheck) {
     throw new Error('403 password does not match');
   }
-  res.cookie('userID', user);
+  res.cookie('userID', userID);
   res.redirect('/urls');
 });
 
