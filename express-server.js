@@ -1,4 +1,3 @@
-
 //Initial Server set up
 
 const express = require('express');
@@ -6,6 +5,8 @@ const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
+const methodOverride = require('method-override');
+
 const app = express();
 const PORT = 8080;
 
@@ -28,6 +29,7 @@ app.use(
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   }),
 );
+app.use(methodOverride('_method'));
 
 //Message on server start up to confirm clean start up
 
@@ -194,7 +196,7 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const user = req.session.userID;
 
@@ -213,7 +215,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const newLongURL = req.body.URLedit;
   const userID = req.session.userID;
