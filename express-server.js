@@ -43,6 +43,12 @@ app.get('/urls', (req, res) => {
   const userID = req.session.userID;
   const user = users[userID];
   const UserURLS = URLChecker(URLDatabase, userID);
+  console.log(Object.keys(users).length);
+
+  if (!userChecker(users, 'id', userID).result && Object.keys(users).length === 1) {
+    res.redirect('/urls/register');
+    throw new Error('404 account not found');
+  }
 
   if (!userChecker(users, 'id', userID).result) {
     res.redirect('/urls/login');

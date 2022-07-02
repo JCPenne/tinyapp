@@ -18,9 +18,6 @@ const users = {
     password: 'abc',
     hashedPassword: '',
   },
-  abc123: {
-    id: 'abc123',
-  },
 };
 
 module.exports = { users, URLDatabase };
