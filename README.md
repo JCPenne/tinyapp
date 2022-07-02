@@ -12,3 +12,33 @@ This app is intended to be locally hosted and therefore before using the app, yo
 - Within your web browser of choice navigate to the homepage by visiting http://localhost:8080/urls
 - Register your account with an email and password.
 - Now you can start creating your own short URLs!
+
+## Possible Routes
+
+### Gets
+
+- localhost:8080/urls
+- localhost:8080/urls/register
+- localhost:8080/urls/login
+- localhost:8080/urls/new
+- localhost:8080/urls/:shortURL
+- localhost:8080/u/:shortURL
+
+### Posts
+
+- localhost:8080/urls/
+- localhost:8080/urls/register
+- localhost:8080/urls/login
+- localhost:8080/urls/logout
+
+### Deletes
+
+- localhost:8080/urls/:shortURL
+
+### Puts
+
+- localhost:8080/urls/:shortURL
+
+## Correct Server Bootup Example
+
+![Server Start up](//Users/jackpalmer/lighthouse/tinyapp/screenshots/Screen Shot 2022-07-02 at 1.39.44 PM (2).png?raw=true "Server Start Up")
