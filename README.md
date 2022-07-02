@@ -1,13 +1,31 @@
 # TinyApp
 
-TinyApp is a copy of common URL shorteners, such as TinyURL, Bitly.
-Used to shorten lengthy URLs to allow for easier sharing, or usage, and avoid typing or memorizing a long URL.
+TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).
 
 This app is intended to be locally hosted and therefore before using the app, you must set up and run the server code which can be found in this repo.
 
+## Final Product
+
+![Create TinyURL](/screenshots/Create%20TinyURL.png?raw=true "Create Tiny URL")
+![View and Edit TinyURL](/screenshots/View%20and%20Edit%20TinyURL.png?raw=true "View and Edit TinyURL")
+![List of TinyURLS](/screenshots/List%20of%20TinyURLS.png?raw=true "List of TinyURLs")
+
+## Dependencies
+- Bcryptjs
+- Body-parser
+- Cookie-session
+- Ejs
+- Express
+- Method-override
+- Morgan
+## Dev Dependencies
+- Chai
+- Mocha
+- Nodemon
 ## Getting Started
 
-- Pull all code from this repo and ensure all dependencies are installed correctly.
+- Install all dependencies using the `node -i` command
+  - Install all dev dependencies using the `node -i --save-dev` command
 - Run the server using the `npm run dev` command while inside the TinyApp root folder.
 - Within your web browser of choice navigate to the homepage by visiting http://localhost:8080/urls
 - Register your account with an email and password.
