@@ -1,4 +1,10 @@
-const generateRandomString = URL => {
+/**
+ * Return a 6 character random string to create the TinyURL hyperlink
+ * @param {String}
+ * @returns {String}
+ */
+
+const generateRandomString = () => {
   result = '';
 
   for (let i = 0; i < 6; i++) {
@@ -8,8 +14,17 @@ const generateRandomString = URL => {
   return result;
 };
 
+/**
+ * Return an object showing whether a user exists within the database, based on dynamic values, using a boolean value.
+ * @param {Object} data
+ * @param {String} key
+ * @param {String} value
+ * @returns {Object}
+ */
+
 const userChecker = (data, key, value) => {
-  const users = data
+  const users = data;
+
   let resultObj = {
     result: false,
   };
@@ -26,6 +41,13 @@ const userChecker = (data, key, value) => {
   }
   return resultObj;
 };
+
+/**
+ * Return an object showing whether a URL in the database belongs to the current user.
+ * @param {Object} obj
+ * @param {String} user
+ * @returns {Object}
+ */
 
 const URLChecker = (obj, user) => {
   let result = {};

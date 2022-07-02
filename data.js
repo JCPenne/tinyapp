@@ -10,16 +10,13 @@ const URLDatabase = {
     userID: '',
   },
 };
-//testPassword for encrypt assignment use only
-
-const user123abchashedPassword = bcrypt.hashSync('abc', 10);
 
 const users = {
   '123abc': {
     id: '123abc',
     email: 'a@a.com',
     password: 'abc',
-    hashedPassword: user123abchashedPassword,
+    hashedPassword: '',
   },
   abc123: {
     id: 'abc123',

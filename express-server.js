@@ -1,15 +1,20 @@
-//Server set up//
+
+//Initial Server set up
 
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
+const app = express();
+const PORT = 8080;
+
+//Function imports
+
 const { generateRandomString, userChecker, URLChecker } = require('./helpers');
 const { users, URLDatabase } = require('./data');
 
-const app = express();
-const PORT = 8080;
+//Initiate middleware
 
 app.set(`view engine`, `ejs`);
 app.use(morgan('tiny'));
@@ -24,45 +29,16 @@ app.use(
   }),
 );
 
-//Message on server start up
+//Message on server start up to confirm clean start up
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
 
-//Global Vars
-
-// const URLDatabase = {
-//   '2bxVn2': {
-//     longURL: 'http://www.lighthouselabs.ca',
-//     userID: '123abc',
-//   },
-//   '9sm5xK': {
-//     longURL: 'http://www.google.com',
-//     userID: '',
-//   },
-// };
-
-// //testPassword for encrypt assignment use only
-// const user123abchashedPassword = bcrypt.hashSync('abc', 10);
-
-// const users = {
-//   '123abc': {
-//     id: '123abc',
-//     email: 'a@a.com',
-//     password: 'abc',
-//     hashedPassword: user123abchashedPassword,
-//   },
-//   abc123: {
-//     id: 'abc123',
-//   },
-// };
-
 //GETS
 
 app.get('/urls', (req, res) => {
   const userID = req.session.userID;
-
   const user = users[userID];
   const UserURLS = URLChecker(URLDatabase, userID);
 
@@ -111,6 +87,7 @@ app.get('/urls/new', (req, res) => {
   const templateVars = {
     user,
   };
+
   res.render('urls-new', templateVars);
 });
 
@@ -138,13 +115,13 @@ app.get('/urls/:shortURL', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = URLDatabase[shortURL].longURL;
-
   const userID = req.session.userID;
 
   if (!userChecker(users, 'id', userID).result) {
     res.redirect(longURL);
     throw new Error('404 user not found');
   }
+
   res.redirect(longURL);
 });
 
@@ -185,20 +162,18 @@ app.post('/register', (req, res) => {
     email,
     hashedPassword,
   };
+
   req.session.userID = userID;
+
   res.redirect('/urls');
 });
 
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-
   const emailCheck = userChecker(users, 'email', email).result;
-
   const userID = userChecker(users, 'email', email).user;
-
   const hashedPassword = users[userID].hashedPassword;
-
   const passwordCheck = bcrypt.compareSync(password, hashedPassword);
 
   if (!emailCheck) {
@@ -207,7 +182,9 @@ app.post('/login', (req, res) => {
   if (!passwordCheck) {
     throw new Error('403 password does not match');
   }
+
   req.session.userID = userID;
+
   res.redirect('/urls');
 });
 
@@ -219,7 +196,6 @@ app.post('/logout', (req, res) => {
 
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
-
   const user = req.session.userID;
 
   if (!userChecker(users, 'id', user).result) {
@@ -240,8 +216,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 app.post('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const newLongURL = req.body.URLedit;
-
-  // const URLUserID = URLDatabase[shortURL].userID;
   const userID = req.session.userID;
 
   if (!userChecker(users, 'id', userID).result) {
