@@ -41,4 +41,4 @@ This app is intended to be locally hosted and therefore before using the app, yo
 
 ## Correct Server Bootup Example
 
-![Server Start up](//Users/jackpalmer/lighthouse/tinyapp/screenshots/Screen Shot 2022-07-02 at 1.39.44 PM (2).png?raw=true "Server Start Up")
+![Server Start up](/screenshots/TinyAppScreenshot.png?raw=true "Server Start Up")
