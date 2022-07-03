@@ -113,11 +113,21 @@ app.get('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
 
   if (!userChecker(users, 'id', userID).result) {
-    res.send('404 please login to your account');
+    const templateVars = {
+      user: '',
+      error: 401,
+      message: 'Please log in to your account',
+    };
+    return res.render('error', templateVars);
   }
 
   if (!URLChecker(URLDatabase, userID)[shortURL]) {
-    res.send('That url does not belong to your account');
+    const templateVars = {
+      user: '',
+      error: 403,
+      message: 'That url does not belong to your account',
+    };
+    return res.render('error', templateVars);
   }
 
   const templateVars = {
@@ -135,8 +145,12 @@ app.get('/u/:shortURL', (req, res) => {
   const longURL = URLDatabase[shortURL].longURL;
 
   if (!userChecker(users, 'id', userID).result) {
-    res.redirect(longURL);
-    res.send('404 user not found');
+    const templateVars = {
+      user: '',
+      error: 401,
+      message: 'Please log in to your account',
+    };
+    return res.render('error', templateVars);
   }
 
   res.redirect(longURL);
@@ -166,10 +180,20 @@ app.post('/register', (req, res) => {
   const emailCheck = userChecker(users, 'email', email).result;
 
   if (!email || !password) {
-    res.send(`400 Email and Password fields cannot be empty`);
+    const templateVars = {
+      user: '',
+      error: 400,
+      message: 'Email and Password fields cannot be empty',
+    };
+    return res.render('error', templateVars);
   }
   if (emailCheck) {
-    res.send('400 that email is already in use');
+    const templateVars = {
+      user: '',
+      error: 400,
+      message: 'That email is already in use!',
+    };
+    return res.render('error', templateVars);
   }
 
   userID = generateRandomString();
@@ -194,10 +218,20 @@ app.post('/login', (req, res) => {
   const passwordCheck = bcrypt.compareSync(password, hashedPassword);
 
   if (!emailCheck) {
-    res.send('403 email not found');
+    const templateVars = {
+      user: '',
+      error: 404,
+      message: 'Email not found',
+    };
+    return res.render('error', templateVars);
   }
   if (!passwordCheck) {
-    res.send('403 password does not match');
+    const templateVars = {
+      user: '',
+      error: 400,
+      message: 'Password does not match',
+    };
+    return res.render('error', templateVars);
   }
 
   req.session.userID = userID;
@@ -216,13 +250,28 @@ app.delete('/urls/:shortURL', (req, res) => {
   const userID = req.session.userID;
 
   if (!userChecker(users, 'id', userID).result) {
-    res.send('404 Please log in to your account');
+    const templateVars = {
+      user: '',
+      error: 403,
+      message: 'Please log in to your account first!',
+    };
+    return res.render('error', templateVars);
   }
   if (!URLDatabase[shortURL]) {
-    res.send('URL not found');
+    const templateVars = {
+      user: '',
+      error: 404,
+      message: 'URL not found',
+    };
+    return res.render('error', templateVars);
   }
   if (URLDatabase[shortURL].userID !== userID) {
-    res.send('404 that URL does not belong to your account');
+    const templateVars = {
+      user: '',
+      error: 403,
+      message: 'That URL does not belong to your account!',
+    };
+    return res.render('error', templateVars);
   }
 
   delete URLDatabase[shortURL];
@@ -236,13 +285,28 @@ app.put('/urls/:shortURL', (req, res) => {
   const newLongURL = req.body.URLedit;
 
   if (!userChecker(users, 'id', userID).result) {
-    res.send('404 Please log in to your account');
+    const templateVars = {
+      user: '',
+      error: 403,
+      message: 'Please log in to your account first!',
+    };
+    return res.render('error', templateVars);
   }
   if (!URLDatabase[shortURL]) {
-    res.send('404 URL not found');
+    const templateVars = {
+      user: '',
+      error: 404,
+      message: 'URL not found',
+    };
+    return res.render('error', templateVars);
   }
   if (URLDatabase[shortURL].userID !== userID) {
-    res.send('404 that URL does not belong to your account');
+    const templateVars = {
+      user: '',
+      error: 403,
+      message: 'That URL does not belong to your account!',
+    };
+    return res.render('error', templateVars);
   }
 
   URLDatabase[shortURL].longURL = newLongURL;
