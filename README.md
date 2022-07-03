@@ -27,7 +27,7 @@ This app is intended to be locally hosted and therefore before using the app, yo
 - Install all dependencies using the `node -i` command
   - Install all dev dependencies using the `node -i --save-dev` command
 - Run the server using the `npm run dev` command while inside the TinyApp root folder.
-- Within your web browser of choice navigate to the homepage by visiting http://localhost:8080/urls
+- Within your web browser of choice navigate to the homepage by visiting http://localhost:8080/home
 - Register your account with an email and password.
 - Now you can start creating your own short URLs!
 

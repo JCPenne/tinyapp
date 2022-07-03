@@ -65,13 +65,13 @@ app.get('/urls', (req, res) => {
   };
 
   if (!userChecker(users, 'id', userID).result && Object.keys(users).length === 1) {
-    res.redirect('/home');
+    res.redirect('/login');
   }
 
   res.render(`urls-index`, templateVars);
 });
 
-app.get('/urls/register', (req, res) => {
+app.get('/register', (req, res) => {
   const userID = req.session.userID;
   const user = users[userID];
 
@@ -82,7 +82,7 @@ app.get('/urls/register', (req, res) => {
   res.render('urls-register', templateVars);
 });
 
-app.get('/urls/login', (req, res) => {
+app.get('/login', (req, res) => {
   const userID = req.session.userID;
   const user = users[userID];
 
@@ -97,7 +97,7 @@ app.get('/urls/new', (req, res) => {
   const user = users[userID];
 
   if (!userID) {
-    res.redirect('/urls/login');
+    res.redirect('/login');
   }
 
   const templateVars = {
@@ -173,7 +173,7 @@ app.post('/urls', (req, res) => {
   const shortURL = generateRandomString(longURL);
 
   if (!userID) {
-    res.redirect('/urls/login');
+    res.redirect('/login');
     res.send('401, unauthorized user');
   }
 
