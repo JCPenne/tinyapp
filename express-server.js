@@ -65,9 +65,12 @@ app.get('/urls', (req, res) => {
   };
 
   if (!userChecker(users, 'id', userID).result && Object.keys(users).length === 1) {
-    res.redirect('/login');
+    res.redirect('/register');
   }
 
+  if (!userChecker(users, 'id', userID).result) {
+    res.redirect('/login');
+  }
   res.render(`urls-index`, templateVars);
 });
 
