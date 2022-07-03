@@ -121,6 +121,15 @@ app.get('/urls/:shortURL', (req, res) => {
     return res.render('error', templateVars);
   }
 
+  if (!URLDatabase[shortURL]) {
+    const templateVars = {
+      user: '',
+      error: 404,
+      message: 'URL not found',
+    };
+    return res.render('error', templateVars);
+  }
+
   if (!URLChecker(URLDatabase, userID)[shortURL]) {
     const templateVars = {
       user: '',
