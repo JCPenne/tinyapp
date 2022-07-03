@@ -31,34 +31,42 @@ app.use(
 );
 app.use(methodOverride('_method'));
 
-//Message on server start up to confirm clean start up
+//GETS
 
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+app.get('/', (req, res) => {
+  const userID = req.session.userID;
+
+  if (!userChecker(users, 'id', userID).result && Object.keys(users).length === 1) {
+    res.redirect('/home');
+  }
+
+  if (userChecker(users, 'id', userID).result) {
+    res.redirect('/urls');
+  }
 });
 
-//GETS
+app.get('/home', (req, res) => {
+  const userID = req.session.userID;
+  const user = users[userID];
+  const templateVars = {
+    user,
+  };
+  res.render('home', templateVars);
+});
 
 app.get('/urls', (req, res) => {
   const userID = req.session.userID;
   const user = users[userID];
   const UserURLS = URLChecker(URLDatabase, userID);
-  console.log(Object.keys(users).length);
-
-  if (!userChecker(users, 'id', userID).result && Object.keys(users).length === 1) {
-    res.redirect('/urls/register');
-    throw new Error('404 account not found');
-  }
-
-  if (!userChecker(users, 'id', userID).result) {
-    res.redirect('/urls/login');
-    throw new Error('404 account not found');
-  }
 
   const templateVars = {
     user,
     UserURLS,
   };
+
+  if (!userChecker(users, 'id', userID).result && Object.keys(users).length === 1) {
+    res.redirect('/home');
+  }
 
   res.render(`urls-index`, templateVars);
 });
@@ -100,15 +108,16 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  const user = users[req.session.userID];
+  const userID = req.session.userID;
+  const user = users[userID];
   const shortURL = req.params.shortURL;
 
-  if (!userChecker(users, 'id', user.id).result) {
-    throw new Error('404 please login to your account');
+  if (!userChecker(users, 'id', userID).result) {
+    res.send('404 please login to your account');
   }
 
-  if (!URLChecker(URLDatabase, user.id)[shortURL]) {
-    throw new Error('That url does not belong to your account');
+  if (!URLChecker(URLDatabase, userID)[shortURL]) {
+    res.send('That url does not belong to your account');
   }
 
   const templateVars = {
@@ -121,13 +130,13 @@ app.get('/urls/:shortURL', (req, res) => {
 });
 
 app.get('/u/:shortURL', (req, res) => {
+  const userID = req.session.userID;
   const shortURL = req.params.shortURL;
   const longURL = URLDatabase[shortURL].longURL;
-  const userID = req.session.userID;
 
   if (!userChecker(users, 'id', userID).result) {
     res.redirect(longURL);
-    throw new Error('404 user not found');
+    res.send('404 user not found');
   }
 
   res.redirect(longURL);
@@ -142,7 +151,7 @@ app.post('/urls', (req, res) => {
 
   if (!userID) {
     res.redirect('/urls/login');
-    throw new Error('401, unauthorized user');
+    res.send('401, unauthorized user');
   }
 
   URLDatabase[shortURL] = { longURL, userID };
@@ -157,10 +166,10 @@ app.post('/register', (req, res) => {
   const emailCheck = userChecker(users, 'email', email).result;
 
   if (!email || !password) {
-    throw new Error(`400 Email and Password fields cannot be empty`);
+    res.send(`400 Email and Password fields cannot be empty`);
   }
   if (emailCheck) {
-    throw new Error('400 that email is already in use');
+    res.send('400 that email is already in use');
   }
 
   userID = generateRandomString();
@@ -185,10 +194,10 @@ app.post('/login', (req, res) => {
   const passwordCheck = bcrypt.compareSync(password, hashedPassword);
 
   if (!emailCheck) {
-    throw new Error('403 email not found');
+    res.send('403 email not found');
   }
   if (!passwordCheck) {
-    throw new Error('403 password does not match');
+    res.send('403 password does not match');
   }
 
   req.session.userID = userID;
@@ -204,16 +213,16 @@ app.post('/logout', (req, res) => {
 
 app.delete('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
-  const user = req.session.userID;
+  const userID = req.session.userID;
 
-  if (!userChecker(users, 'id', user).result) {
-    throw new Error('404 Please log in to your account');
+  if (!userChecker(users, 'id', userID).result) {
+    res.send('404 Please log in to your account');
   }
   if (!URLDatabase[shortURL]) {
-    throw new Error('URL not found');
+    res.send('URL not found');
   }
-  if (URLDatabase[shortURL].userID !== user) {
-    throw new Error('404 that URL does not belong to your account');
+  if (URLDatabase[shortURL].userID !== userID) {
+    res.send('404 that URL does not belong to your account');
   }
 
   delete URLDatabase[shortURL];
@@ -222,21 +231,27 @@ app.delete('/urls/:shortURL', (req, res) => {
 });
 
 app.put('/urls/:shortURL', (req, res) => {
+  const userID = req.session.userID;
   const shortURL = req.params.shortURL;
   const newLongURL = req.body.URLedit;
-  const userID = req.session.userID;
 
   if (!userChecker(users, 'id', userID).result) {
-    throw new Error('404 Please log in to your account');
+    res.send('404 Please log in to your account');
   }
   if (!URLDatabase[shortURL]) {
-    throw new Error('404 URL not found');
+    res.send('404 URL not found');
   }
   if (URLDatabase[shortURL].userID !== userID) {
-    throw new Error('404 that URL does not belong to your account');
+    res.send('404 that URL does not belong to your account');
   }
 
   URLDatabase[shortURL].longURL = newLongURL;
 
   res.redirect('/urls');
+});
+
+//Message on server start up to confirm clean start up
+
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
 });
